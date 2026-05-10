@@ -1,0 +1,21 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="style.css">
+  <title>My First three.js</title>
+</head>
+<body>
+  <!-- ここに three.js が自動で <canvas> を作る -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.176.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.176.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
