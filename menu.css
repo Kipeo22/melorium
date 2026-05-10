@@ -1,20 +1,21 @@
 /* モーダルウィンドウを丸くする */
 
 .modaal-container {
-    width: 500px !important;
-    height: 500px !important;
-    border-radius: 50% !important;
+    width: 500px ;
+    height: 500px ;
+    border-radius: 50% ;
     overflow: hidden;
 }
 
 .modaal-content-container {
-    width: 500px !important;
-    height: 500px !important;
-    border-radius: 50% !important;
+    width: 500px ;
+    height: 500px ;
+    border-radius: 50% ;
 
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: #E9E2D8;
 } 
 
 /* 画像の上に文字を置く */
@@ -52,4 +53,28 @@
     align-items: center !important;
 
     gap: 20px !important;
+}
+
+/* ×の調整 */
+
+.modaal-close:before,
+.modaal-close:after{
+    background: #8E897A;
+    height: 80px ;
+}
+
+.modaal-close:hover:before,
+.modaal-close:hover:after{
+    background: #8E897A;
+}
+
+.modaal-close{
+    width: 150px ;
+    height: 150px ;
+    top: 120px;
+    right: 400px;
+}
+
+.modaal-close:hover{
+    background: transparent !important;
 }
