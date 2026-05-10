@@ -1,1 +1,3 @@
-$(".modal-button").modaal();
+$(function () {
+    $('.modal-button').modaal();
+});

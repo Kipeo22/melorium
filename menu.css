@@ -1,3 +1,45 @@
-#menu{
-    padding: 100px 0;
+/* モーダルウィンドウを丸くする */
+
+.modaal-container {
+    width: 500px !important;
+    height: 500px !important;
+    border-radius: 50% !important;
+    overflow: hidden;
+}
+
+.modaal-content-container {
+    width: 500px !important;
+    height: 500px !important;
+    border-radius: 50% !important;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+} 
+
+/* 画像の上に文字を置く */
+
+.menu a{
+    text-decoration: none;
+}
+
+.menu-button{
+    position: relative;
+    width: 300px;
+    margin: auto;
+}
+
+.menu-button img{
+    width: 100%;
+    display: block;
+}
+
+.menu-button p{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    color: #8E897A;
+    white-space: nowrap;
 }
