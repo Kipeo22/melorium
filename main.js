@@ -4,7 +4,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
-console.log('aaa')
+const yAxis = new THREE.Vector3(0, 1, 0);
+const showColliderHelpers = true;
 
 //シーンを作る
 const scene = new THREE.Scene();
@@ -77,81 +78,256 @@ camera.add(crosshair);
 // ---------- GLB の読み込み ----------
 const loader = new GLTFLoader()
 
-const glbPath1 = "./models/fdoor.glb"
-const glbPath2 = "./models/mdoor.glb"
-const glbPath3 = "./models/pdoor.glb"
+function applyModelShadow(model) {
+  model.receiveShadow = true;
 
-//fdoorの読み込み
-  loader.load(
-  glbPath1,
-  function (gltf) {
-    const model1 = gltf.scene; //<-ここの変数を増やす
-    
-    // モデルのサイズや位置を調整
-    model1.scale.set(0.5, 0.5, 0.5); //モデルの大きさを調整
-    model1.rotation.set(0, Math.PI, 0); // モデルの回転を調整
-    model1.position.set(5.8,1.95,0);//モデルの位置を調整
-    model1.receiveShadow = true;//影を付ける
-    
-        // 子要素にも影の設定を適用
-    model1.traverse((child) => {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-      }
+  model.traverse((child) => {
+    if (child.isMesh) {
+      child.castShadow = true;
+      child.receiveShadow = true;
+    }
+  });
+}
+
+function createLocalBounds(object, padding = 0) {
+  object.updateMatrixWorld(true);
+
+  const rootInverseMatrix = object.matrixWorld.clone().invert();
+  const localBounds = new THREE.Box3();
+  const meshCorner = new THREE.Vector3();
+
+  object.traverse((child) => {
+    if (!child.isMesh || !child.geometry) {
+      return;
+    }
+
+    if (!child.geometry.boundingBox) {
+      child.geometry.computeBoundingBox();
+    }
+
+    const box = child.geometry.boundingBox;
+    const corners = [
+      [box.min.x, box.min.y, box.min.z],
+      [box.min.x, box.min.y, box.max.z],
+      [box.min.x, box.max.y, box.min.z],
+      [box.min.x, box.max.y, box.max.z],
+      [box.max.x, box.min.y, box.min.z],
+      [box.max.x, box.min.y, box.max.z],
+      [box.max.x, box.max.y, box.min.z],
+      [box.max.x, box.max.y, box.max.z],
+    ];
+
+    for (const corner of corners) {
+      meshCorner
+        .set(corner[0], corner[1], corner[2])
+        .applyMatrix4(child.matrixWorld)
+        .applyMatrix4(rootInverseMatrix);
+      localBounds.expandByPoint(meshCorner);
+    }
+  });
+
+  if (padding > 0) {
+    localBounds.expandByScalar(padding);
+  }
+
+  return localBounds;
+}
+
+function loadGLBObject({ path, name, scale, rotation, position, colliderPadding = 0, collider = null }) {
+  loader.load(path, (gltf) => {
+    const model = gltf.scene;
+
+    model.name = name;
+    model.scale.copy(scale);
+    model.rotation.set(rotation.x, rotation.y, rotation.z);
+    model.position.copy(position);
+    applyModelShadow(model);
+
+    scene.add(model);
+    colliders.addObjectLocalBounds({
+      name,
+      object: model,
+      padding: colliderPadding,
+      center: collider?.center,
+      size: collider?.size,
     });
-   
-    scene.add(model1);
-    console.log("モデル1が正常に読み込まれました。");
-  })
+    console.log(`${name}が正常に読み込まれました。`);
+  });
+}
 
-  //mdoorのオブジェクトを読み込み
-  loader.load(
-  glbPath2,
-  function (gltf) {
-    const model2 = gltf.scene; //<-ここの変数を増やす
-    
-    // モデルのサイズや位置を調整
-    model2.scale.set(0.5, 0.5, 0.5); //モデルの大きさを調整
-    model2.rotation.set(0, Math.PI/3, 0); // モデルの回転を調整
-    model2.position.set(-2.9,1.95,5.023);//モデルの位置を調整
-    model2.receiveShadow = true;//影を付ける
-    
-        // 子要素にも影の設定を適用
-    model2.traverse((child) => {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-      }
-    });
-   
-    scene.add(model2);
-    console.log("モデル2が正常に読み込まれました。");
-  })
+// ---------- 本の作成 ----------
+const textureLoader = new THREE.TextureLoader();
 
-  //pdoorオブジェクトを読み込み
-  loader.load(
-    glbPath3,
-    function (gltf) {
-      const model3 = gltf.scene; //<-ここの変数を増やす
-    
-      // モデルのサイズや位置を調整
-    model3.scale.set(0.5, 0.5, 0.5); //モデルの大きさを調整
-    model3.rotation.set(0, Math.PI*-1/3, 0); // モデルの回転を調整
-    model3.position.set(-2.9,1.95,-5.023);//モデルの位置を調整
-    model3.receiveShadow = true;//影を付ける
-    
-            // 子要素にも影の設定を適用
-      model3.traverse((child) => {
-        if (child.isMesh) {
-          child.castShadow = true;
-          child.receiveShadow = true;
-        }
-      });
-   
-      scene.add(model3);
-      console.log("モデル3が正常に読み込まれました。");
-    })   
+function loadBookTexture(path) {
+  const texture = textureLoader.load(path);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.wrapS = THREE.ClampToEdgeWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
+  texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  return texture;
+}
+
+function createSolidMaterial(color, roughness = 0.9) {
+  return new THREE.MeshStandardMaterial({
+    color,
+    roughness,
+    metalness: 0,
+  });
+}
+
+function createOverlayMaterial(texture) {
+  return new THREE.MeshPhysicalMaterial({
+    map: texture,
+    transparent: true,
+    alphaTest: 0.04,
+    depthWrite: false,
+    roughness: 0.28,
+    metalness: 0.18,
+    clearcoat: 0.55,
+    clearcoatRoughness: 0.18,
+    side: THREE.FrontSide,
+  });
+}
+
+function createBook() {
+  const baseTexture = loadBookTexture('./images/red-ura.jpg');
+  const coverTexture = loadBookTexture('./images/陽だまりのセツナ.png');
+  const spineTexture = loadBookTexture('./images/陽だまりのセツナ1背.png');
+
+  const book = new THREE.Group();
+  book.name = 'hidamari-book';
+
+  const bookWidth = 1.05;
+  const bookHeight = bookWidth * (790 / 569);
+  const pageDepth = bookHeight * (306 / 1580);
+  const boardDepth = 0.04;
+  const totalDepth = pageDepth + boardDepth * 2;
+  const coverOffset = 0.006;
+
+  const baseMaterial = new THREE.MeshStandardMaterial({
+    map: baseTexture,
+    roughness: 0.74,
+    metalness: 0,
+  });
+  const coverOverlayMaterial = createOverlayMaterial(coverTexture);
+  const spineOverlayMaterial = createOverlayMaterial(spineTexture);
+  const coverEdgeMaterial = createSolidMaterial(0x7a1f20, 0.82);
+  const pageMaterial = createSolidMaterial(0xf2ead7);
+  const topBottomMaterial = createSolidMaterial(0xd6ccb4);
+
+  const pageBlock = new THREE.Mesh(
+    new THREE.BoxGeometry(bookWidth - boardDepth * 1.7, bookHeight - 0.08, pageDepth),
+    [
+      pageMaterial,
+      coverEdgeMaterial,
+      topBottomMaterial,
+      topBottomMaterial,
+      pageMaterial,
+      pageMaterial,
+    ]
+  );
+  pageBlock.position.x = boardDepth * 0.35;
+  pageBlock.castShadow = true;
+  pageBlock.receiveShadow = true;
+  book.add(pageBlock);
+
+  const frontCover = new THREE.Mesh(
+    new THREE.BoxGeometry(bookWidth, bookHeight, boardDepth),
+    [
+      coverEdgeMaterial,
+      coverEdgeMaterial,
+      coverEdgeMaterial,
+      coverEdgeMaterial,
+      baseMaterial,
+      coverEdgeMaterial,
+    ]
+  );
+  frontCover.position.z = pageDepth / 2 + boardDepth / 2;
+  frontCover.castShadow = true;
+  frontCover.receiveShadow = true;
+  book.add(frontCover);
+
+  const backCover = new THREE.Mesh(
+    new THREE.BoxGeometry(bookWidth, bookHeight, boardDepth),
+    [
+      coverEdgeMaterial,
+      coverEdgeMaterial,
+      coverEdgeMaterial,
+      coverEdgeMaterial,
+      coverEdgeMaterial,
+      baseMaterial,
+    ]
+  );
+  backCover.position.z = -pageDepth / 2 - boardDepth / 2;
+  backCover.castShadow = true;
+  backCover.receiveShadow = true;
+  book.add(backCover);
+
+  const spine = new THREE.Mesh(
+    new THREE.BoxGeometry(boardDepth, bookHeight, totalDepth),
+    [
+      coverEdgeMaterial,
+      baseMaterial,
+      coverEdgeMaterial,
+      coverEdgeMaterial,
+      coverEdgeMaterial,
+      coverEdgeMaterial,
+    ]
+  );
+  spine.position.x = -bookWidth / 2 + boardDepth / 2;
+  spine.castShadow = true;
+  spine.receiveShadow = true;
+  book.add(spine);
+
+  const frontOverlay = new THREE.Mesh(
+    new THREE.PlaneGeometry(bookWidth, bookHeight),
+    coverOverlayMaterial
+  );
+  frontOverlay.position.z = pageDepth / 2 + boardDepth + coverOffset;
+  frontOverlay.castShadow = false;
+  frontOverlay.receiveShadow = true;
+  book.add(frontOverlay);
+
+  const spineOverlay = new THREE.Mesh(
+    new THREE.PlaneGeometry(totalDepth, bookHeight),
+    spineOverlayMaterial
+  );
+  spineOverlay.rotation.y = -Math.PI / 2;
+  spineOverlay.position.x = -bookWidth / 2 - coverOffset;
+  spineOverlay.castShadow = false;
+  spineOverlay.receiveShadow = true;
+  book.add(spineOverlay);
+
+  const pageLineMaterial = new THREE.LineBasicMaterial({
+    color: 0xc4b99f,
+    transparent: true,
+    opacity: 0.72,
+  });
+  const pageLines = new THREE.Group();
+  const pageSideX = bookWidth / 2 - 0.025;
+  const lineCount = 24;
+  for (let i = 0; i < lineCount; i++) {
+    const y = -bookHeight * 0.43 + (bookHeight * 0.86 * i) / (lineCount - 1);
+    const points = [
+      new THREE.Vector3(pageSideX, y, -pageDepth / 2 + 0.012),
+      new THREE.Vector3(pageSideX, y + Math.sin(i * 1.7) * 0.003, pageDepth / 2 - 0.012),
+    ];
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    pageLines.add(new THREE.Line(geometry, pageLineMaterial));
+  }
+  book.add(pageLines);
+
+  book.position.set(0, bookHeight / 2 + 0.16, -2.6);
+  scene.add(book);
+
+  colliders.addObjectBox({
+    name: 'hidamari-book',
+    object: book,
+    halfSize: new THREE.Vector3(bookWidth / 2, bookHeight / 2, totalDepth / 2),
+  });
+
+  return book;
+}
 
 //光  
 
@@ -193,9 +369,338 @@ document.addEventListener('keyup', (e) => keys[e.code] = false);
 const direction = new THREE.Vector3();
 const velocity = new THREE.Vector3();
 
-//透明の壁を作成
-const groundRadius = 6.2;
-const groundCenter = new THREE.Vector3(0, 0, 0);
+//透明の壁とオブジェクト当たり判定
+class CollisionSystem {
+  constructor(playerRadius, playerHeight) {
+    this.playerRadius = playerRadius;
+    this.playerHeight = playerHeight;
+    this.boundaries = [];
+    this.boxes = [];
+  }
+
+  addCircleBoundary({ center, radius }) {
+    this.boundaries.push({ center: center.clone(), radius });
+  }
+
+  addBox({ name, center, halfSize, rotationY = 0 }) {
+    this.boxes.push({
+      type: 'box',
+      name,
+      center: center.clone(),
+      halfSize: halfSize.clone(),
+      rotationY,
+      object: null,
+    });
+  }
+
+  addObjectBox({ name, object, halfSize }) {
+    this.boxes.push({
+      type: 'objectBox',
+      name,
+      center: object.position.clone(),
+      halfSize: halfSize.clone(),
+      rotationY: object.rotation.y,
+      object,
+    });
+  }
+
+  addObjectBounds({ name, object, padding = 0 }) {
+    this.boxes.push({
+      type: 'objectBounds',
+      name,
+      object,
+      padding,
+      bounds: new THREE.Box3(),
+    });
+  }
+
+  addObjectLocalBounds({ name, object, padding = 0, center = null, size = null }) {
+    const localBounds = center && size
+      ? new THREE.Box3().setFromCenterAndSize(center, size)
+      : createLocalBounds(object, padding);
+
+    if (center && size && padding > 0) {
+      localBounds.expandByScalar(padding);
+    }
+    const helperSize = localBounds.getSize(new THREE.Vector3());
+    const helperCenter = localBounds.getCenter(new THREE.Vector3());
+
+    const collider = {
+      type: 'objectLocalBounds',
+      name,
+      object,
+      localBounds,
+      center: helperCenter,
+      size: helperSize,
+      worldScale: new THREE.Vector3(),
+      localPosition: new THREE.Vector3(),
+      localResolvedPosition: new THREE.Vector3(),
+      worldResolvedPosition: new THREE.Vector3(),
+    };
+
+    if (showColliderHelpers) {
+      const helperMaterial = new THREE.MeshBasicMaterial({
+        color: 0x00ff66,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.85,
+        depthTest: false,
+      });
+      const helper = new THREE.Mesh(
+        new THREE.BoxGeometry(helperSize.x, helperSize.y, helperSize.z),
+        helperMaterial
+      );
+      helper.name = `${name}-collider-helper`;
+      helper.position.copy(helperCenter);
+      helper.renderOrder = 999;
+      object.add(helper);
+      collider.helper = helper;
+    }
+
+    this.boxes.push(collider);
+  }
+
+  resolvePlayerPosition(position) {
+    this.resolveCircleBoundaries(position);
+    this.resolveBoxes(position);
+  }
+
+  resolveCircleBoundaries(position) {
+    for (const boundary of this.boundaries) {
+      const playerOffset = new THREE.Vector3(
+        position.x - boundary.center.x,
+        0,
+        position.z - boundary.center.z
+      );
+      const distance = playerOffset.length();
+      const allowedDistance = boundary.radius - this.playerRadius;
+
+      if (distance > allowedDistance) {
+        playerOffset.normalize().multiplyScalar(allowedDistance);
+        position.x = boundary.center.x + playerOffset.x;
+        position.z = boundary.center.z + playerOffset.z;
+      }
+    }
+  }
+
+  resolveBoxes(position) {
+    for (const box of this.boxes) {
+      if (box.type === 'objectBounds') {
+        box.object.updateMatrixWorld(true);
+        box.bounds.setFromObject(box.object);
+
+        if (box.padding > 0) {
+          box.bounds.expandByScalar(box.padding);
+        }
+
+        this.resolveAxisAlignedBox(position, box.bounds);
+        continue;
+      }
+
+      if (box.type === 'objectLocalBounds') {
+        this.resolveObjectLocalBounds(position, box);
+        continue;
+      }
+
+      this.resolveOrientedBox(position, box);
+    }
+  }
+
+  resolveAxisAlignedBox(position, box) {
+    const playerBottom = position.y - this.playerHeight;
+    const playerTop = position.y;
+
+    if (playerTop < box.min.y || playerBottom > box.max.y) {
+      return;
+    }
+
+    const closestX = THREE.MathUtils.clamp(position.x, box.min.x, box.max.x);
+    const closestZ = THREE.MathUtils.clamp(position.z, box.min.z, box.max.z);
+    const deltaX = position.x - closestX;
+    const deltaZ = position.z - closestZ;
+    const distanceSq = deltaX * deltaX + deltaZ * deltaZ;
+
+    if (distanceSq > this.playerRadius * this.playerRadius) {
+      return;
+    }
+
+    if (distanceSq === 0) {
+      const pushLeft = Math.abs(position.x - box.min.x);
+      const pushRight = Math.abs(box.max.x - position.x);
+      const pushBack = Math.abs(position.z - box.min.z);
+      const pushFront = Math.abs(box.max.z - position.z);
+      const minPush = Math.min(pushLeft, pushRight, pushBack, pushFront);
+
+      if (minPush === pushLeft) {
+        position.x = box.min.x - this.playerRadius;
+      } else if (minPush === pushRight) {
+        position.x = box.max.x + this.playerRadius;
+      } else if (minPush === pushBack) {
+        position.z = box.min.z - this.playerRadius;
+      } else {
+        position.z = box.max.z + this.playerRadius;
+      }
+
+      return;
+    }
+
+    const distance = Math.sqrt(distanceSq);
+    const pushDistance = this.playerRadius - distance;
+    position.x += (deltaX / distance) * pushDistance;
+    position.z += (deltaZ / distance) * pushDistance;
+  }
+
+  resolveObjectLocalBounds(position, box) {
+    box.object.getWorldScale(box.worldScale);
+
+    const radiusX = this.playerRadius / Math.abs(box.worldScale.x || 1);
+    const radiusZ = this.playerRadius / Math.abs(box.worldScale.z || 1);
+    const playerBottom = (position.y - this.playerHeight - box.object.position.y) / Math.abs(box.worldScale.y || 1);
+    const playerTop = (position.y - box.object.position.y) / Math.abs(box.worldScale.y || 1);
+
+    if (playerTop < box.localBounds.min.y || playerBottom > box.localBounds.max.y) {
+      return;
+    }
+
+    box.localPosition.copy(position);
+    box.object.worldToLocal(box.localPosition);
+
+    const closestX = THREE.MathUtils.clamp(box.localPosition.x, box.localBounds.min.x, box.localBounds.max.x);
+    const closestZ = THREE.MathUtils.clamp(box.localPosition.z, box.localBounds.min.z, box.localBounds.max.z);
+    const deltaX = box.localPosition.x - closestX;
+    const deltaZ = box.localPosition.z - closestZ;
+    const normalizedDistanceSq =
+      (deltaX * deltaX) / (radiusX * radiusX) +
+      (deltaZ * deltaZ) / (radiusZ * radiusZ);
+
+    if (normalizedDistanceSq > 1) {
+      return;
+    }
+
+    box.localResolvedPosition.copy(box.localPosition);
+
+    if (normalizedDistanceSq === 0) {
+      const pushLeft = Math.abs(box.localPosition.x - box.localBounds.min.x) / radiusX;
+      const pushRight = Math.abs(box.localBounds.max.x - box.localPosition.x) / radiusX;
+      const pushBack = Math.abs(box.localPosition.z - box.localBounds.min.z) / radiusZ;
+      const pushFront = Math.abs(box.localBounds.max.z - box.localPosition.z) / radiusZ;
+      const minPush = Math.min(pushLeft, pushRight, pushBack, pushFront);
+
+      if (minPush === pushLeft) {
+        box.localResolvedPosition.x = box.localBounds.min.x - radiusX;
+      } else if (minPush === pushRight) {
+        box.localResolvedPosition.x = box.localBounds.max.x + radiusX;
+      } else if (minPush === pushBack) {
+        box.localResolvedPosition.z = box.localBounds.min.z - radiusZ;
+      } else {
+        box.localResolvedPosition.z = box.localBounds.max.z + radiusZ;
+      }
+    } else {
+      const normalizedDistance = Math.sqrt(normalizedDistanceSq);
+      box.localResolvedPosition.x = closestX + deltaX / normalizedDistance;
+      box.localResolvedPosition.z = closestZ + deltaZ / normalizedDistance;
+    }
+
+    box.worldResolvedPosition.copy(box.localResolvedPosition);
+    box.object.localToWorld(box.worldResolvedPosition);
+    position.x = box.worldResolvedPosition.x;
+    position.z = box.worldResolvedPosition.z;
+  }
+
+  resolveOrientedBox(position, box) {
+    const playerBottom = position.y - this.playerHeight;
+    const playerTop = position.y;
+    const center = box.object ? box.object.getWorldPosition(new THREE.Vector3()) : box.center;
+    const rotationY = box.object ? box.object.rotation.y : box.rotationY;
+    const boxBottom = center.y - box.halfSize.y;
+    const boxTop = center.y + box.halfSize.y;
+
+    if (playerTop < boxBottom || playerBottom > boxTop) {
+      return;
+    }
+
+    const localPosition = new THREE.Vector3(
+      position.x - center.x,
+      0,
+      position.z - center.z
+    ).applyAxisAngle(yAxis, -rotationY);
+
+    const closestX = THREE.MathUtils.clamp(localPosition.x, -box.halfSize.x, box.halfSize.x);
+    const closestZ = THREE.MathUtils.clamp(localPosition.z, -box.halfSize.z, box.halfSize.z);
+    const deltaX = localPosition.x - closestX;
+    const deltaZ = localPosition.z - closestZ;
+    const distanceSq = deltaX * deltaX + deltaZ * deltaZ;
+
+    if (distanceSq > this.playerRadius * this.playerRadius) {
+      return;
+    }
+
+    if (distanceSq === 0) {
+      const pushLeft = Math.abs(localPosition.x + box.halfSize.x);
+      const pushRight = Math.abs(box.halfSize.x - localPosition.x);
+      const pushBack = Math.abs(localPosition.z + box.halfSize.z);
+      const pushFront = Math.abs(box.halfSize.z - localPosition.z);
+      const minPush = Math.min(pushLeft, pushRight, pushBack, pushFront);
+
+      if (minPush === pushLeft) {
+        localPosition.x = -box.halfSize.x - this.playerRadius;
+      } else if (minPush === pushRight) {
+        localPosition.x = box.halfSize.x + this.playerRadius;
+      } else if (minPush === pushBack) {
+        localPosition.z = -box.halfSize.z - this.playerRadius;
+      } else {
+        localPosition.z = box.halfSize.z + this.playerRadius;
+      }
+    } else {
+      const distance = Math.sqrt(distanceSq);
+      const pushDistance = this.playerRadius - distance;
+      localPosition.x += (deltaX / distance) * pushDistance;
+      localPosition.z += (deltaZ / distance) * pushDistance;
+    }
+
+    const resolvedPosition = localPosition.applyAxisAngle(yAxis, rotationY);
+    position.x = center.x + resolvedPosition.x;
+    position.z = center.z + resolvedPosition.z;
+  }
+}
+
+const colliders = new CollisionSystem(0.25, 2.6);
+colliders.addCircleBoundary({
+  center: new THREE.Vector3(0, 0, 0),
+  radius: 6.2,
+});
+
+// GLB追加時はここに1件足す。判定が合わない時は colliderPadding または collider.center/size で調整する。
+const glbObjects = [
+  {
+    path: './models/fdoor.glb',
+    name: 'fdoor',
+    scale: new THREE.Vector3(0.5, 0.5, 0.5),
+    rotation: new THREE.Euler(0, Math.PI, 0),
+    position: new THREE.Vector3(5.8, 1.95, 0),
+  },
+  {
+    path: './models/mdoor.glb',
+    name: 'mdoor',
+    scale: new THREE.Vector3(0.5, 0.5, 0.5),
+    rotation: new THREE.Euler(0, Math.PI / 3, 0),
+    position: new THREE.Vector3(-2.9, 1.95, 5.023),
+  },
+  {
+    path: './models/pdoor.glb',
+    name: 'pdoor',
+    scale: new THREE.Vector3(0.5, 0.5, 0.5),
+    rotation: new THREE.Euler(0, Math.PI * -1 / 3, 0),
+    position: new THREE.Vector3(-2.9, 1.95, -5.023),
+  },
+];
+
+glbObjects.forEach(loadGLBObject);
+createBook();
+
+const bookHighlight = new THREE.PointLight(0xffe1a3, 1.2, 5);
+bookHighlight.position.set(0.2, 2.3, -1.4);
+scene.add(bookHighlight);
 
  // 毎フレーム（60回/秒）動かす関数
 function animate() {
@@ -217,19 +722,9 @@ function animate() {
  // 実際にカメラを動かす
  controls.moveRight(velocity.x);
  controls.moveForward(velocity.z);
- // --- 円形制限 ---
 
  const player = controls.getObject();
- const playerPos = player.position.clone();
- playerPos.y = 0;
-
- const distance = playerPos.distanceTo(groundCenter);
-
- if (distance > groundRadius - 0.2) { // 少し内側に余裕を持たせる
-   playerPos.normalize().multiplyScalar(groundRadius - 0.2);
-   player.position.x = playerPos.x;
-   player.position.z = playerPos.z;
- }
+ colliders.resolvePlayerPosition(player.position);
  }
 
   renderer.render(scene, camera);
