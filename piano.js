@@ -6,12 +6,14 @@ import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 // import { texture } from "three/src/nodes/accessors/TextureNode.js";
 // import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
+console.log(`piano.js loaded`)
+
 const yAxis = new THREE.Vector3(0, 1, 0);
 const showColliderHelpers = true;
 
 //シーンを作る
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xadadad);
+scene.background = new THREE.Color(0xa2b3b2);
 
 //カメラを作る
 const camera = new THREE.PerspectiveCamera(
@@ -44,7 +46,7 @@ const floor_geometry = new THREE.CylinderGeometry(
 );
 
 const floor_material = new THREE.MeshStandardMaterial({
-  color: 0x7d7d7d,
+  color: 0xa1d8ed,
   roughness: 1,
   metalness: 0
 });
@@ -747,10 +749,10 @@ const glbObjects = [
   {
     path: './models/door.glb',
     name: 'mdoor',
+    texture: './images/mdoorm.png',
     scale: new THREE.Vector3(0.5, 0.5, 0.5),
     rotation: new THREE.Euler(0, Math.PI / 3, 0),
     position: new THREE.Vector3(-2.9, 1.95, 5.023),
-    texture: './images/mdoorm.png',
   },
   {
     path: './models/door.glb',
@@ -765,85 +767,79 @@ const glbObjects = [
 glbObjects.forEach(loadGLBObject);
 createBook();
 
-// //机をつくるなど
+//机をつくるなど
 
-// //マテリアルを追加する
+//マテリアルを追加する
 
-// const material = new THREE.MeshPhysicalMaterial({
-//   //envMap: new THREE.TextureLoader().load("sample.png"),  
-//   color: 0xffffff,
-//   //
-//   roughness: 0.0,
-//   metalness: 0.0,
+const material = new THREE.MeshPhysicalMaterial({
+  color: 0xffffff,
 
-//   //クリアコート層の強度
-//   clearcoat: 1.0, // Default:0.0, max:1.0
-//   clearcoatRoughness: 1.0, // Default:0.0, max:1.0
-//   //clearcoatMap : new THREE.TextureLoader().load("sample.png"),
+  transmission: 1.0,
+  thickness: 1.5,
 
-//   //非金属材料の屈折率
-//   ior: 1.1,  //from 1.0 to 2.333. Default is 1.5
-//   //
-//   reflectivity: 0.01, // Default:0.0, max:1.0
-//   // 
-//   iridescence: 1.0, // 強度　Default:0.0, max:1.0
-//   iridescenceIOR: 1.0, // 虹の屈折率　Default is 1.3　1.0~2.33  1.3
-  
-//   //光沢層の強度、
-//   sheen: 1.0, // Default:0.0 max:1.0  0.1
-//   sheenRoughness: 0.0, 
-//   sheenColor : 0xFFFFFF,
+  roughness: 0.08,
+  metalness: 0,
 
-//   //鏡面強度
-//   specularIntensity : 10.0, // 1.0
-//   specularColor : 0xFFFFFF,
-//   //specularColorMap :new THREE.TextureLoader().load("sample.png"),
+  ior: 1.52,
 
-//   // 厚み
-//   thickness:10.00, //
-//   //thicknessMap: new THREE.TextureLoader().load("sample.png"),
-  
-//   //伝搬
-//   transmission: 1.0, // <= ガラス
-//   //transmissionMap: new THREE.TextureLoader().load("sample.png"),
+  attenuationDistance: 2.0,
+  attenuationColor: new THREE.Color(0xe8f8ff),
 
-//   //
-//   transparent: true,
-//   opacity: 1.0,
-//   wireframe: false,
-// });
+  clearcoat: 0,
+  iridescence: 0,
+  sheen: 0,
 
-// let modelSet = false; //モデルの読み込みが完了したかのフラグ
-// let GlassObject;
+  transparent: true,
+  opacity: 1,
+});
 
-// // const loader = new GLTFLoader();
-// loader.load( 'models/table.glb', function ( gltf ) {
-//   const model =  gltf.scene;
-//   let num = 0;
+//マテリアルここまで
 
-//  model.traverse((object) => {
-//   if (object.isMesh) {
+let modelSet = false; //モデルの読み込みが完了したかのフラグ
+let GlassObject;
 
-//     if (object.material.name === "ガラス") {
-//       object.material = material.clone();
-//     }
+// const loader = new GLTFLoader();
+loader.load( 'models/table.glb', function ( gltf ) {
+  const model =  gltf.scene;
+  let num = 0;
 
-//     object.number = num;
-//     num++;
-//   }
-// });
+ model.traverse((object) => {
+  if (object.isMesh) {
 
+     object.castShadow = true;     // 影を落とす
+    object.receiveShadow = true;  // 影を受ける
 
+    if (object.material.name === "ガラス") {
+      object.material = material.clone();
+    }
 
-//   GlassObject = model;
-//   GlassObject.scale.set(0.3, 0.3, 0.3);
-//   GlassObject.position.set(0,0.4,0);
+    if (object.material.name === "木材") {
+      const woodTexture = textureLoader.load('./images/pdoorm.png');
 
-//   scene.add(GlassObject);
-//   modelSet = true;
-// })
+      object.material = new THREE.MeshStandardMaterial({
+      map: woodTexture,
+      });
+    }
 
-// // //マテリアルここまで
+    object.number = num;
+    num++;
+  }
+});
+
+  GlassObject = model;
+  GlassObject.scale.set(0.3, 0.3, 0.3);
+  GlassObject.position.set(0,0.4,0);
+
+  scene.add(GlassObject);
+
+colliders.addObjectLocalBounds({
+  name: 'ptable',
+  object: GlassObject,
+  padding: 0.05,
+});
+
+  modelSet = true;
+})
 
 const bookHighlight = new THREE.PointLight(0xffe1a3, 1.2, 5);
 bookHighlight.position.set(0.2, 2.3, -1.4);
