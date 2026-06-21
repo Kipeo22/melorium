@@ -753,7 +753,7 @@ createBook();
 // let GlassObject;
 
 // // const loader = new GLTFLoader();
-// loader.load( 'models/ptable.glb', function ( gltf ) {
+// loader.load( 'models/table.glb', function ( gltf ) {
 //   const model =  gltf.scene;
 //   let num = 0;
 
