@@ -330,6 +330,8 @@ function createBook() {
   return book;
 }
 
+// ---------- 本ここまで ----------
+
 //光  
 
   //環境光
@@ -674,21 +676,21 @@ colliders.addCircleBoundary({
 // GLB追加時はここに1件足す。判定が合わない時は colliderPadding または collider.center/size で調整する。
 const glbObjects = [
   {
-    path: './models/fdoor.glb',
+    path: './models/door.glb',
     name: 'fdoor',
     scale: new THREE.Vector3(0.5, 0.5, 0.5),
     rotation: new THREE.Euler(0, Math.PI, 0),
     position: new THREE.Vector3(5.8, 1.95, 0),
   },
   {
-    path: './models/mdoor.glb',
+    path: './models/door.glb',
     name: 'mdoor',
     scale: new THREE.Vector3(0.5, 0.5, 0.5),
     rotation: new THREE.Euler(0, Math.PI / 3, 0),
     position: new THREE.Vector3(-2.9, 1.95, 5.023),
   },
   {
-    path: './models/pdoor.glb',
+    path: './models/door.glb',
     name: 'pdoor',
     scale: new THREE.Vector3(0.5, 0.5, 0.5),
     rotation: new THREE.Euler(0, Math.PI * -1 / 3, 0),
@@ -747,35 +749,37 @@ createBook();
 //   wireframe: false,
 // });
 
-// //マテリアルここまで
+// let modelSet = false; //モデルの読み込みが完了したかのフラグ
+// let GlassObject;
 
-let modelSet = false; //モデルの読み込みが完了したかのフラグ
-let GlassObject;
+// // const loader = new GLTFLoader();
+// loader.load( 'models/ptable.glb', function ( gltf ) {
+//   const model =  gltf.scene;
+//   let num = 0;
 
-// const loader = new GLTFLoader();
-loader.load( 'models/ptable.glb', function ( gltf ) {
-  const model =  gltf.scene;
-  let num = 0;
+//  model.traverse((object) => {
+//   if (object.isMesh) {
 
- model.traverse((object) => {
-  if (object.isMesh) {
+//     if (object.material.name === "ガラス") {
+//       object.material = material.clone();
+//     }
 
-    if (object.material.name === "ガラス") {
-      object.material = material.clone();
-    }
+//     object.number = num;
+//     num++;
+//   }
+// });
 
-    object.number = num;
-    num++;
-  }
-});
 
-  GlassObject = model;
-  GlassObject.scale.set(0.3, 0.3, 0.3);
-  GlassObject.position.set(0,0.4,0);
 
-  scene.add(GlassObject);
-  modelSet = true;
-})
+//   GlassObject = model;
+//   GlassObject.scale.set(0.3, 0.3, 0.3);
+//   GlassObject.position.set(0,0.4,0);
+
+//   scene.add(GlassObject);
+//   modelSet = true;
+// })
+
+// // //マテリアルここまで
 
 const bookHighlight = new THREE.PointLight(0xffe1a3, 1.2, 5);
 bookHighlight.position.set(0.2, 2.3, -1.4);
