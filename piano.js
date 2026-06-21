@@ -9,7 +9,7 @@ import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 console.log(`piano.js loaded`)
 
 const yAxis = new THREE.Vector3(0, 1, 0);
-const showColliderHelpers = true;
+const showColliderHelpers = false; //アシスト線
 
 //シーンを作る
 const scene = new THREE.Scene();
@@ -254,9 +254,9 @@ function createOverlayMaterial(texture) {
 }
 
 function createBook() {
-  const baseTexture = loadBookTexture('./images/red-ura.jpg');
-  const coverTexture = loadBookTexture('./images/陽だまりのセツナ.png');
-  const spineTexture = loadBookTexture('./images/陽だまりのセツナ1背.png');
+  const baseTexture = loadBookTexture('./images/blue-ura.jpg');
+  const coverTexture = loadBookTexture('./images/Dec.png');
+  const spineTexture = loadBookTexture('./images/Dec1背.png');
 
   const book = new THREE.Group();
   book.name = 'hidamari-book';
@@ -275,9 +275,9 @@ function createBook() {
   });
   const coverOverlayMaterial = createOverlayMaterial(coverTexture);
   const spineOverlayMaterial = createOverlayMaterial(spineTexture);
-  const coverEdgeMaterial = createSolidMaterial(0x7a1f20, 0.82);
-  const pageMaterial = createSolidMaterial(0xf2ead7);
-  const topBottomMaterial = createSolidMaterial(0xd6ccb4);
+  const coverEdgeMaterial = createSolidMaterial(0x173046, 0.82);
+  const pageMaterial = createSolidMaterial(0xf2ead7); //小口染めのところ
+  const topBottomMaterial = createSolidMaterial(0xd6ccb4); //紙の上下
 
   const pageBlock = new THREE.Mesh(
     new THREE.BoxGeometry(bookWidth - boardDepth * 1.7, bookHeight - 0.08, pageDepth),
@@ -795,57 +795,106 @@ const material = new THREE.MeshPhysicalMaterial({
 
 //マテリアルここまで
 
-let modelSet = false; //モデルの読み込みが完了したかのフラグ
+let modelSet = false;
 let GlassObject;
 
-// const loader = new GLTFLoader();
-loader.load( 'models/table.glb', function ( gltf ) {
-  const model =  gltf.scene;
-  let num = 0;
+function setupTableMaterial(model) {
+  model.traverse((object) => {
+    if (!object.isMesh) return;
 
- model.traverse((object) => {
-  if (object.isMesh) {
-
-     object.castShadow = true;     // 影を落とす
-    object.receiveShadow = true;  // 影を受ける
-
-    if (object.material.name === "ガラス") {
+    // material がないメッシュ対策
+    if (object.material && object.material.name === "ガラス") {
       object.material = material.clone();
     }
 
-    if (object.material.name === "木材") {
-      const woodTexture = textureLoader.load('./images/pdoorm.png');
+    object.castShadow = true;
+    object.receiveShadow = true;
+  });
+}
 
-      object.material = new THREE.MeshStandardMaterial({
-      map: woodTexture,
-      });
-    }
-
-    object.number = num;
-    num++;
+function cloneGlassObject(position, rotationY = 0) {
+  if (!GlassObject) {
+    console.warn("GlassObject はまだ読み込まれていません");
+    return null;
   }
-});
+
+  const clonedObject = GlassObject.clone(true);
+
+  clonedObject.position.copy(position);
+  clonedObject.rotation.y = rotationY;
+
+  // clone後、materialも個別にcloneする
+  clonedObject.traverse((child) => {
+    if (!child.isMesh) return;
+
+    child.castShadow = true;
+    child.receiveShadow = true;
+
+    if (Array.isArray(child.material)) {
+      child.material = child.material.map((mat) => {
+        return mat ? mat.clone() : new THREE.MeshStandardMaterial();
+      });
+    } else if (child.material) {
+      child.material = child.material.clone();
+    } else {
+      child.material = new THREE.MeshStandardMaterial();
+    }
+  });
+
+  scene.add(clonedObject);
+
+  return clonedObject;
+}
+
+loader.load('models/table.glb', function (gltf) {
+  const model = gltf.scene;
+
+  setupTableMaterial(model);
 
   GlassObject = model;
   GlassObject.scale.set(0.3, 0.3, 0.3);
-  GlassObject.position.set(0,0.4,0);
+  GlassObject.position.set(0, 0.4, 0);
 
   scene.add(GlassObject);
+  modelSet = true;
 
-colliders.addObjectLocalBounds({
-  name: 'ptable',
-  object: GlassObject,
-  padding: 0.05,
+  // ここなら読み込み完了後なので clone できる
+  cloneGlassObject(new THREE.Vector3(2, 0.4, 0));
 });
 
+
+// colliders.addObjectLocalBounds({
+//   name: 'ptable',
+//   object: GlassObject,
+//   padding: 0.05,
+// });
+
   modelSet = true;
-})
 
 const bookHighlight = new THREE.PointLight(0xffe1a3, 1.2, 5);
 bookHighlight.position.set(0.2, 2.3, -1.4);
 scene.add(bookHighlight);
 
 //机ここまで
+
+//机を増やす
+
+//   const Dec = GlassObject.clone();
+//   Dec.position.set( 3.5, 0.4,  0);
+
+//   const Aquarium = ptable.clone(true);
+//   table2.position.set( 0, 0.4,  3.5);
+
+//   const Angel = ptable.clone(true);
+//   table3.position.set(-3.5, 0.4,  0);
+
+//   const Sleep = ptable.clone(true);
+//   table4.position.set( 0, 0.4, -3.5);
+
+//   scene.add(Dec);
+//   scene.add(Aquarium);
+//   scene.add(Angel);
+//   scene.add(Sleep);
 
  // 毎フレーム（60回/秒）動かす関数
 function animate() {
