@@ -699,55 +699,55 @@ const glbObjects = [
 glbObjects.forEach(loadGLBObject);
 createBook();
 
-//机をつくるなど
+// //机をつくるなど
 
-//マテリアルを追加する
+// //マテリアルを追加する
 
-const material = new THREE.MeshPhysicalMaterial({
-  //envMap: new THREE.TextureLoader().load("sample.png"),  
-  color: 0xffffff,
-  //
-  roughness: 0.0,
-  metalness: 0.0,
+// const material = new THREE.MeshPhysicalMaterial({
+//   //envMap: new THREE.TextureLoader().load("sample.png"),  
+//   color: 0xffffff,
+//   //
+//   roughness: 0.0,
+//   metalness: 0.0,
 
-  //クリアコート層の強度
-  clearcoat: 1.0, // Default:0.0, max:1.0
-  clearcoatRoughness: 1.0, // Default:0.0, max:1.0
-  //clearcoatMap : new THREE.TextureLoader().load("sample.png"),
+//   //クリアコート層の強度
+//   clearcoat: 1.0, // Default:0.0, max:1.0
+//   clearcoatRoughness: 1.0, // Default:0.0, max:1.0
+//   //clearcoatMap : new THREE.TextureLoader().load("sample.png"),
 
-  //非金属材料の屈折率
-  ior: 1.1,  //from 1.0 to 2.333. Default is 1.5
-  //
-  reflectivity: 0.01, // Default:0.0, max:1.0
-  // 
-  iridescence: 1.0, // 強度　Default:0.0, max:1.0
-  iridescenceIOR: 1.0, // 虹の屈折率　Default is 1.3　1.0~2.33  1.3
+//   //非金属材料の屈折率
+//   ior: 1.1,  //from 1.0 to 2.333. Default is 1.5
+//   //
+//   reflectivity: 0.01, // Default:0.0, max:1.0
+//   // 
+//   iridescence: 1.0, // 強度　Default:0.0, max:1.0
+//   iridescenceIOR: 1.0, // 虹の屈折率　Default is 1.3　1.0~2.33  1.3
   
-  //光沢層の強度、
-  sheen: 1.0, // Default:0.0 max:1.0  0.1
-  sheenRoughness: 0.0, 
-  sheenColor : 0xFFFFFF,
+//   //光沢層の強度、
+//   sheen: 1.0, // Default:0.0 max:1.0  0.1
+//   sheenRoughness: 0.0, 
+//   sheenColor : 0xFFFFFF,
 
-  //鏡面強度
-  specularIntensity : 10.0, // 1.0
-  specularColor : 0xFFFFFF,
-  //specularColorMap :new THREE.TextureLoader().load("sample.png"),
+//   //鏡面強度
+//   specularIntensity : 10.0, // 1.0
+//   specularColor : 0xFFFFFF,
+//   //specularColorMap :new THREE.TextureLoader().load("sample.png"),
 
-  // 厚み
-  thickness:10.00, //
-  //thicknessMap: new THREE.TextureLoader().load("sample.png"),
+//   // 厚み
+//   thickness:10.00, //
+//   //thicknessMap: new THREE.TextureLoader().load("sample.png"),
   
-  //伝搬
-  transmission: 1.0, // <= ガラス
-  //transmissionMap: new THREE.TextureLoader().load("sample.png"),
+//   //伝搬
+//   transmission: 1.0, // <= ガラス
+//   //transmissionMap: new THREE.TextureLoader().load("sample.png"),
 
-  //
-  transparent: true,
-  opacity: 1.0,
-  wireframe: false,
-});
+//   //
+//   transparent: true,
+//   opacity: 1.0,
+//   wireframe: false,
+// });
 
-//マテリアルここまで
+// //マテリアルここまで
 
 let modelSet = false; //モデルの読み込みが完了したかのフラグ
 let GlassObject;
