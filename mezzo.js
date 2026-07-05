@@ -1,4 +1,3 @@
-
 //インポートから始まるのは全部ここ
 import * as THREE from "three";
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -7,14 +6,14 @@ import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 // import { texture } from "three/src/nodes/accessors/TextureNode.js";
 // import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
-console.log(`forte.js loaded`)
+console.log(`piano.js loaded`)
 
 const yAxis = new THREE.Vector3(0, 1, 0);
 const showColliderHelpers = false; //アシスト線
 
 //シーンを作る
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xb3a2ac);
+scene.background = new THREE.Color(0xA2B3AA);
 
 //カメラを作る
 const camera = new THREE.PerspectiveCamera(
@@ -47,7 +46,7 @@ const floor_geometry = new THREE.CylinderGeometry(
 );
 
 const floor_material = new THREE.MeshStandardMaterial({
-  color: 0xeda1d4,
+  color: 0xa1eda1,
   roughness: 1,
   metalness: 0
 });
@@ -255,7 +254,7 @@ function createOverlayMaterial(texture) {
 }
 
 function createBook(coverTexturePath,spineTexturePath,position,rotation) {
-  const baseTexture = loadBookTexture('./images/red-ura.jpg');
+  const baseTexture = loadBookTexture('./images/green-ura.jpg');
   const coverTexture = loadBookTexture(coverTexturePath);
   const spineTexture = loadBookTexture(spineTexturePath);
 
@@ -278,7 +277,7 @@ function createBook(coverTexturePath,spineTexturePath,position,rotation) {
   });
   const coverOverlayMaterial = createOverlayMaterial(coverTexture);
   const spineOverlayMaterial = createOverlayMaterial(spineTexture);
-  const coverEdgeMaterial = createSolidMaterial(0x59171E, 0.82);
+  const coverEdgeMaterial = createSolidMaterial(0x1B2F23, 0.82);
   const pageMaterial = createSolidMaterial(0xf2ead7); //小口染めのところ
   const topBottomMaterial = createSolidMaterial(0xd6ccb4); //紙の上下
 
@@ -742,16 +741,16 @@ colliders.addCircleBoundary({
 const glbObjects = [
   {
     path: './models/door.glb',
-    name: 'mdoor',
-    texture: './images/mdoorm.png',
+    name: 'pdoor',
+    texture: './images/pdoorm.png',
     scale: new THREE.Vector3(0.5, 0.5, 0.5),
     rotation: new THREE.Euler(0, Math.PI, 0),
     position: new THREE.Vector3(5.8, 1.95, 0),
   },
   {
     path: './models/door.glb',
-    name: 'pdoor',
-    texture: './images/pdoorm.png',
+    name: 'fdoor',
+    texture: './images/fdoorm.png',
     scale: new THREE.Vector3(0.5, 0.5, 0.5),
     rotation: new THREE.Euler(0, Math.PI / 3, 0),
     position: new THREE.Vector3(-2.9, 1.95, 5.023),
@@ -769,9 +768,12 @@ const glbObjects = [
 //本を複製する
 
 glbObjects.forEach(loadGLBObject);
-const book1 = createBook("./images/陽だまりのセツナ.png","./images/陽だまりのセツナ1背.png",new THREE.Vector3(-1.5, 2, 1.5),new THREE.Euler(-Math.PI/2,0,-Math.PI/4));
-// const book2 = createBook("./images/Sleepwalk.png","./images/Sleepwalk3背.png",new THREE.Vector3(1.5, 2, -1.5),new THREE.Euler(-Math.PI/2,0,Math.PI *3/4));
-
+const book1 = createBook("./images/プラネテス.png","./images/プラネテス1背.png",new THREE.Vector3(-1.5, 2, 1.5),new THREE.Euler(-Math.PI/2,0,-Math.PI/4));
+const book2 = createBook("./images/メアリー・スーの憂鬱.png","./images/メアリー・スーの憂鬱3背.png",new THREE.Vector3(1.5, 2, -1.5),new THREE.Euler(-Math.PI/2,0,Math.PI *3/4));
+//book1.rotation.y = -Math.PI * 3 / 4;
+// book2.rotation.y = -Math.PI / 4;
+// book3.rotation.y =  Math.PI / 4;
+// book4.rotation.y =  Math.PI * 3 / 4;
 //机をつくるなど
 
 //マテリアルを追加する

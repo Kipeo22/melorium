@@ -757,8 +757,8 @@ const glbObjects = [
   },
   {
     path: './models/door.glb',
-    name: 'pdoor',
-    texture: './images/pdoorm.png',
+    name: 'ldoor',
+    texture: './images/ldoorm.png',
     scale: new THREE.Vector3(0.5, 0.5, 0.5),
     rotation: new THREE.Euler(0, Math.PI * -1 / 3, 0),
     position: new THREE.Vector3(-2.9, 1.95, -5.023),
