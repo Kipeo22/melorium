@@ -798,6 +798,23 @@ const material = new THREE.MeshPhysicalMaterial({
   opacity: 1,
 });
 
+function loadTableTexture(path){
+ const texture = textureLoader.load(path);
+ texture.colorSpace = THREE.SRGBColorSpace;
+ texture.flipY = false;
+ texture.wrapS = THREE.RepeatWrapping;
+ texture.wrapT = THREE.RepeatWrapping;
+ texture.repeat.set(1,3);
+ texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+ return texture;
+}
+
+const TableTextureMaterial = new THREE.MeshStandardMaterial({
+ map: loadTableTexture('./images/ldoorm.png'),
+ roughness: 0.68,
+ metalness: 0,
+});
+
 //マテリアルここまで
 
 let modelSet = false;
@@ -810,6 +827,8 @@ function setupTableMaterial(model) {
     // material がないメッシュ対策
     if (object.material && object.material.name === "ガラス") {
       object.material = material.clone();
+    }else{
+        object.material = TableTextureMaterial.clone();
     }
 
     object.castShadow = true;
