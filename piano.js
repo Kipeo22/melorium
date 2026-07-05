@@ -853,13 +853,15 @@ loader.load('models/table.glb', function (gltf) {
 
   GlassObject = model;
   GlassObject.scale.set(0.3, 0.3, 0.3);
-  GlassObject.position.set(0, 0.4, 0);
+  GlassObject.position.set(1.5, 0.4, 1.5);
 
   scene.add(GlassObject);
   modelSet = true;
 
   // ここなら読み込み完了後なので clone できる
-  cloneGlassObject(new THREE.Vector3(2, 0.4, 0));
+  cloneGlassObject(new THREE.Vector3(1.5, 0.4, -1.5));
+  cloneGlassObject(new THREE.Vector3(-1.5, 0.4, 1.5));
+  cloneGlassObject(new THREE.Vector3(-1.5, 0.4, -1.5));
 });
 
 
