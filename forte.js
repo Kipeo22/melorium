@@ -6,14 +6,14 @@ import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 // import { texture } from "three/src/nodes/accessors/TextureNode.js";
 // import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
-console.log(`piano.js loaded`)
+console.log(`forte.js loaded`)
 
 const yAxis = new THREE.Vector3(0, 1, 0);
 const showColliderHelpers = false; //アシスト線
 
 //シーンを作る
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xa2b3b2);
+scene.background = new THREE.Color(0xb3a2ac);
 
 //カメラを作る
 const camera = new THREE.PerspectiveCamera(
@@ -46,7 +46,7 @@ const floor_geometry = new THREE.CylinderGeometry(
 );
 
 const floor_material = new THREE.MeshStandardMaterial({
-  color: 0xa1d8ed,
+  color: 0xeda1d4,
   roughness: 1,
   metalness: 0
 });
@@ -254,7 +254,7 @@ function createOverlayMaterial(texture) {
 }
 
 function createBook(coverTexturePath,spineTexturePath,position,rotation) {
-  const baseTexture = loadBookTexture('./images/blue-ura.jpg');
+  const baseTexture = loadBookTexture('./images/red-ura.jpg');
   const coverTexture = loadBookTexture(coverTexturePath);
   const spineTexture = loadBookTexture(spineTexturePath);
 
@@ -770,10 +770,7 @@ const glbObjects = [
 glbObjects.forEach(loadGLBObject);
 const book1 = createBook("./images/Dec.png","./images/Dec1背.png",new THREE.Vector3(-1.5, 2, 1.5),new THREE.Euler(-Math.PI/2,0,-Math.PI/4));
 const book2 = createBook("./images/Sleepwalk.png","./images/Sleepwalk3背.png",new THREE.Vector3(1.5, 2, -1.5),new THREE.Euler(-Math.PI/2,0,Math.PI *3/4));
-//book1.rotation.y = -Math.PI * 3 / 4;
-// book2.rotation.y = -Math.PI / 4;
-// book3.rotation.y =  Math.PI / 4;
-// book4.rotation.y =  Math.PI * 3 / 4;
+
 //机をつくるなど
 
 //マテリアルを追加する
