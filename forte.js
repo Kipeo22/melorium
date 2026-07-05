@@ -47,7 +47,7 @@ const floor_geometry = new THREE.CylinderGeometry(
 );
 
 const floor_material = new THREE.MeshStandardMaterial({
-  color: 0xeda1d4,
+  color: 0xc27a89,
   roughness: 1,
   metalness: 0
 });
@@ -779,10 +779,10 @@ const book1 = createBook("./images/陽だまりのセツナ.png","./images/陽�
 const material = new THREE.MeshPhysicalMaterial({
   color: 0xffffff,
 
-  transmission: 1.0,
+  transmission: 1,
   thickness: 1.5,
 
-  roughness: 0.08,
+  roughness: 0.1,
   metalness: 0,
 
   ior: 1.52,
@@ -790,9 +790,9 @@ const material = new THREE.MeshPhysicalMaterial({
   attenuationDistance: 2.0,
   attenuationColor: new THREE.Color(0xe8f8ff),
 
-  clearcoat: 0,
   iridescence: 0,
   sheen: 0,
+  clearcoatRoughness: 0.1,
 
   transparent: true,
   opacity: 1,
