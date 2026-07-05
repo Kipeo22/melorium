@@ -17,7 +17,7 @@ scene.background = new THREE.Color(0xa2b3b2);
 
 //カメラを作る
 const camera = new THREE.PerspectiveCamera(
-  65, window.innerWidth / window.innerHeight, 0.1, 1000
+  60, window.innerWidth / window.innerHeight, 0.1, 1000
 );
 camera.position.set(0,2.6,0);
 
@@ -253,13 +253,15 @@ function createOverlayMaterial(texture) {
   });
 }
 
-function createBook() {
+function createBook(coverTexturePath,spineTexturePath,position,rotation) {
   const baseTexture = loadBookTexture('./images/blue-ura.jpg');
-  const coverTexture = loadBookTexture('./images/Dec.png');
-  const spineTexture = loadBookTexture('./images/Dec1背.png');
+  const coverTexture = loadBookTexture(coverTexturePath);
+  const spineTexture = loadBookTexture(spineTexturePath);
 
   const book = new THREE.Group();
   book.name = 'hidamari-book';
+  book.position.copy(position);
+  book.rotation.copy(rotation);
 
   const bookWidth = 1.05;
   const bookHeight = bookWidth * (790 / 569);
@@ -380,8 +382,7 @@ function createBook() {
     pageLines.add(new THREE.Line(geometry, pageLineMaterial));
   }
   book.add(pageLines);
-
-  book.position.set(0, bookHeight / 2 + 0.16, -2.6);
+  book.scale.set(0.7, 0.7, 0.7);
   scene.add(book);
 
   colliders.addObjectBox({
@@ -764,8 +765,11 @@ const glbObjects = [
   },
 ];
 
+//本を複製する
+
 glbObjects.forEach(loadGLBObject);
-createBook();
+const book1 = createBook("./images/Dec.png","./images/Dec1背.png",new THREE.Vector3(-1.5, 2, 1.5),new THREE.Euler(-Math.PI/2,0,-Math.PI/4));
+const book2 = createBook("./images/Sleepwalk.png","./images/Sleepwalk3背.png",new THREE.Vector3(1.5, 2, -1.5),new THREE.Euler(-Math.PI/2,0,Math.PI *3/4));
 
 //机をつくるなど
 
