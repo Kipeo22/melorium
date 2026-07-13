@@ -1,3 +1,4 @@
+
 //インポートから始まるのは全部ここ
 import * as THREE from "three";
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -19,10 +20,10 @@ scene.background = new THREE.Color(0xA2B3AA);
 const camera = new THREE.PerspectiveCamera(
   60, window.innerWidth / window.innerHeight, 0.1, 1000
 );
-camera.position.set(0,2.6,0);
+camera.position.set(0, 2.6, 0);
 
 //レンダラー(プロジェクターとスクリーン)
-const renderer = new THREE.WebGLRenderer({antialias: true, powerPreference: "high-performance" });
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
@@ -33,8 +34,8 @@ renderer.toneMappingExposure = 1.0;
 renderer.physicallyCorrectLights = true;          // 物理ベースライティング
 
 
- //影をつける
-renderer.shadowMap.enabled = true; 
+//影をつける
+renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 //床の作成
@@ -52,7 +53,7 @@ const floor_material = new THREE.MeshStandardMaterial({
 });
 
 const plate = new THREE.Mesh(floor_geometry, floor_material);
-plate.position.y =0.009; // 厚みの半分だけ上に
+plate.position.y = 0.009; // 厚みの半分だけ上に
 scene.add(plate);
 
 //床に影を落す
@@ -62,21 +63,21 @@ scene.add(plate);
 
 //クロスヘア
 
- //1.クロスヘアを設置
+//1.クロスヘアを設置
 const size = 0.02;  // crosshair の長さを調整
 const crossfair_material = new THREE.LineBasicMaterial({ color: 0xffffff });
 
 const crosshairGeometry = new THREE.BufferGeometry();
 const vertices = new Float32Array([
-  -size,  0, -1,   size,  0, -1,   // 横線
-   0, -size, -1,   0,  size, -1    // 縦線
+  -size, 0, -1, size, 0, -1,   // 横線
+  0, -size, -1, 0, size, -1    // 縦線
 ]);
 crosshairGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
 
- // 2. LineSegments で十字を描く
+// 2. LineSegments で十字を描く
 const crosshair = new THREE.LineSegments(crosshairGeometry, crossfair_material);
 
- // 3. カメラに add して、シーンにも camera を add
+// 3. カメラに add して、シーンにも camera を add
 camera.add(crosshair);
 
 // ---------- GLB の読み込み ----------
@@ -158,29 +159,29 @@ function loadGLBObject({
     // テクスチャを読み込む
     let doorTexture = null;
 
-   if (texture) {
-  doorTexture = textureLoader.load(texture);
-  doorTexture.colorSpace = THREE.SRGBColorSpace;
-  doorTexture.flipY = false;
+    if (texture) {
+      doorTexture = textureLoader.load(texture);
+      doorTexture.colorSpace = THREE.SRGBColorSpace;
+      doorTexture.flipY = false;
 
-  // 繰り返し・位置調整を使うため
-  doorTexture.wrapS = THREE.RepeatWrapping;
-  doorTexture.wrapT = THREE.RepeatWrapping;
+      // 繰り返し・位置調整を使うため
+      doorTexture.wrapS = THREE.RepeatWrapping;
+      doorTexture.wrapT = THREE.RepeatWrapping;
 
-  // 回転の中心を画像の中央にする
-  doorTexture.center.set(0.5, 0.5);
+      // 回転の中心を画像の中央にする
+      doorTexture.center.set(0.5, 0.5);
 
-  // テクスチャを回転
-  doorTexture.rotation = Math.PI / 2; // 90度回転
+      // テクスチャを回転
+      doorTexture.rotation = Math.PI / 2; // 90度回転
 
-  // テクスチャの拡大・縮小
-  doorTexture.repeat.set(8, 8);
+      // テクスチャの拡大・縮小
+      doorTexture.repeat.set(8, 8);
 
-  // テクスチャの位置ずらし
-  doorTexture.offset.set(0, 0);
+      // テクスチャの位置ずらし
+      doorTexture.offset.set(0, 0);
 
-  doorTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-}
+      doorTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    }
 
     model.traverse((child) => {
       if (child.isMesh) {
@@ -253,7 +254,7 @@ function createOverlayMaterial(texture) {
   });
 }
 
-function createBook(coverTexturePath,spineTexturePath,position,rotation) {
+function createBook(coverTexturePath, spineTexturePath, position, rotation) {
   const baseTexture = loadBookTexture('./images/green-ura.jpg');
   const coverTexture = loadBookTexture(coverTexturePath);
   const spineTexture = loadBookTexture(spineTexturePath);
@@ -398,41 +399,41 @@ function createBook(coverTexturePath,spineTexturePath,position,rotation) {
 
 //光  
 
-  //環境光
-  const ambientLight = new THREE.AmbientLight(0xffffff, 1); // 色、強度
-  scene.add(ambientLight);
-  ambientLight.castShadow = false;
+//環境光
+const ambientLight = new THREE.AmbientLight(0xffffff, 1); // 色、強度
+scene.add(ambientLight);
+ambientLight.castShadow = false;
 
-  //ライトの調整
-  const sun = new THREE.DirectionalLight(0xffffff, 3.0);
-  sun.position.set(5, 10, 7.5);
-  sun.castShadow = true;//影を落とす
-  scene.add(sun);
-  sun.shadow.mapSize.set(2048, 2048);
-  sun.shadow.normalBias = 0.02;
-  sun.shadow.bias = -0.0001;
-  sun.shadow.camera.near = 1;
-  sun.shadow.camera.far = 50;
+//ライトの調整
+const sun = new THREE.DirectionalLight(0xffffff, 3.0);
+sun.position.set(5, 10, 7.5);
+sun.castShadow = true;//影を落とす
+scene.add(sun);
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.normalBias = 0.02;
+sun.shadow.bias = -0.0001;
+sun.shadow.camera.near = 1;
+sun.shadow.camera.far = 50;
 
 const fill = new THREE.HemisphereLight(0xffffff, 0x444444, 0.5);
 scene.add(fill);
 
 //fps設定
 
- // カメラをマウスで操作できるようにする
+// カメラをマウスで操作できるようにする
 const controls = new PointerLockControls(camera, document.body);
 scene.add(controls.getObject());
 
-document.addEventListener("click", () =>{
+document.addEventListener("click", () => {
   controls.lock()
 })
 
- // キーボードのキーが押されたかチェックする
+// キーボードのキーが押されたかチェックする
 const keys = {};
 document.addEventListener('keydown', (e) => keys[e.code] = true);
 document.addEventListener('keyup', (e) => keys[e.code] = false);
 
- // 動く方向と速さのデータ
+// 動く方向と速さのデータ
 const direction = new THREE.Vector3();
 const velocity = new THREE.Vector3();
 
@@ -768,12 +769,9 @@ const glbObjects = [
 //本を複製する
 
 glbObjects.forEach(loadGLBObject);
-const book1 = createBook("./images/プラネテス.png","./images/プラネテス1背.png",new THREE.Vector3(-1.5, 2, 1.5),new THREE.Euler(-Math.PI/2,0,-Math.PI/4));
-const book2 = createBook("./images/メアリー・スーの憂鬱.png","./images/メアリー・スーの憂鬱3背.png",new THREE.Vector3(1.5, 2, -1.5),new THREE.Euler(-Math.PI/2,0,Math.PI *3/4));
-//book1.rotation.y = -Math.PI * 3 / 4;
-// book2.rotation.y = -Math.PI / 4;
-// book3.rotation.y =  Math.PI / 4;
-// book4.rotation.y =  Math.PI * 3 / 4;
+const book1 = createBook("./images/プラネテス.png", "./images/プラネテス1背.png", new THREE.Vector3(-1.5, 2, 1.5), new THREE.Euler(-Math.PI / 2, 0, -Math.PI / 4));
+const book2 = createBook("./images/メアリー・スーの憂鬱.png", "./images/メアリー・スーの憂鬱3背.png", new THREE.Vector3(1.5, 2, -1.5), new THREE.Euler(-Math.PI / 2, 0, Math.PI * 3 / 4));
+
 //机をつくるなど
 
 //マテリアルを追加する
@@ -782,9 +780,9 @@ const material = new THREE.MeshPhysicalMaterial({
   color: 0xffffff,
 
   transmission: 1.0,
-  thickness: 1.5,
+  thickness: 0,
 
-  roughness: 0.08,
+  roughness: 0.15,
   metalness: 0,
 
   ior: 1.52,
@@ -800,23 +798,22 @@ const material = new THREE.MeshPhysicalMaterial({
   opacity: 1,
 });
 
-function loadTableTexture(path){
- const texture = textureLoader.load(path);
- texture.colorSpace = THREE.SRGBColorSpace;
- texture.flipY = false;
- texture.wrapS = THREE.RepeatWrapping;
- texture.wrapT = THREE.RepeatWrapping;
- texture.repeat.set(1,3);
- texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
- return texture;
+function loadTableTexture(path) {
+  const texture = textureLoader.load(path);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.flipY = false;
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(1, 3);
+  texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  return texture;
 }
 
 const TableTextureMaterial = new THREE.MeshStandardMaterial({
- map: loadTableTexture('./images/ldoorm.png'),
- roughness: 0.68,
- metalness: 0,
+  map: loadTableTexture('./images/ldoorm.png'),
+  roughness: 0.68,
+  metalness: 0,
 });
-
 
 //マテリアルここまで
 
@@ -830,8 +827,8 @@ function setupTableMaterial(model) {
     // material がないメッシュ対策
     if (object.material && object.material.name === "ガラス") {
       object.material = material.clone();
-    }else{
-        object.material = TableTextureMaterial.clone();
+    } else {
+      object.material = TableTextureMaterial.clone();
     }
 
     object.castShadow = true;
@@ -857,7 +854,8 @@ function cloneGlassObject(position, rotationY = 0) {
     child.castShadow = true;
     child.receiveShadow = true;
 
-    if (Array.isArray(child.material)) {      child.material = child.material.map((mat) => {
+    if (Array.isArray(child.material)) {
+      child.material = child.material.map((mat) => {
         return mat ? mat.clone() : new THREE.MeshStandardMaterial();
       });
     } else if (child.material) {
@@ -897,7 +895,7 @@ loader.load('models/table.glb', function (gltf) {
 //   padding: 0.05,
 // });
 
-  modelSet = true;
+modelSet = true;
 
 const bookHighlight = new THREE.PointLight(0xffe1a3, 1.2, 5);
 bookHighlight.position.set(0.2, 2.3, -1.4);
@@ -924,30 +922,30 @@ scene.add(bookHighlight);
 //   scene.add(Angel);
 //   scene.add(Sleep);
 
- // 毎フレーム（60回/秒）動かす関数
+// 毎フレーム（60回/秒）動かす関数
 function animate() {
- requestAnimationFrame(animate);
+  requestAnimationFrame(animate);
 
- if (controls.isLocked) {
-  direction.set(0, 0, 0); // 方向を初期化
+  if (controls.isLocked) {
+    direction.set(0, 0, 0); // 方向を初期化
 
-  // 押されたキーに応じて方向を設定
- if (keys['KeyS']) direction.z -= 0.5;
- if (keys['KeyW']) direction.z += 0.5;
- if (keys['KeyA']) direction.x -= 0.5;
- if (keys['KeyD']) direction.x += 0.5;
+    // 押されたキーに応じて方向を設定
+    if (keys['KeyS']) direction.z -= 0.5;
+    if (keys['KeyW']) direction.z += 0.5;
+    if (keys['KeyA']) direction.x -= 0.5;
+    if (keys['KeyD']) direction.x += 0.5;
 
- direction.normalize(); // 斜めでも速さを一定に
+    direction.normalize(); // 斜めでも速さを一定に
 
- velocity.copy(direction).multiplyScalar(0.04); // 移動の速さを調整
+    velocity.copy(direction).multiplyScalar(0.04); // 移動の速さを調整
 
- // 実際にカメラを動かす
- controls.moveRight(velocity.x);
- controls.moveForward(velocity.z);
+    // 実際にカメラを動かす
+    controls.moveRight(velocity.x);
+    controls.moveForward(velocity.z);
 
- const player = controls.getObject();
- colliders.resolvePlayerPosition(player.position);
- }
+    const player = controls.getObject();
+    colliders.resolvePlayerPosition(player.position);
+  }
 
   renderer.render(scene, camera);
 
